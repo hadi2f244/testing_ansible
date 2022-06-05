@@ -1,0 +1,6 @@
+---
+
+- name: Apply roles
+  hosts: all
+  roles:
+    - {role: package, tags: "package", become: true}
