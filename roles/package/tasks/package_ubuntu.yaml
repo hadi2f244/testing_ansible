@@ -1,0 +1,71 @@
+---
+- name: "Install python for working ansbile with server"
+  raw: >
+      test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+  register: install_python_output
+  changed_when: install_python_output.rc != 0
+
+- name: Update apt repo and cache on all Debian/Ubuntu boxes
+  apt: update_cache=yes force_apt_get=yes
+
+- name: "Install common packages"
+  apt:
+    name: "{{ pkgs_item }}"
+    state: present
+    update_cache: 'yes'
+    cache_valid_time: 3600
+  with_items:
+    - "{{ pkgs_common }}"
+    - "{{ pkgs_ubuntu }}"
+  loop_control:
+    loop_var: pkgs_item
+  when:
+    - pkgs_common is defined
+    - pkgs_ubuntu is defined
+  notify: Restart Nginx
+
+- name: "Create symlinks python and pip"
+  file:
+    src: "/usr/bin/python3"
+    dest: "/usr/bin/python"
+    state: link
+    force: true
+- name: Get installed pip version
+  command: "{{ pip_executable }} --version"
+  register: pip_version_output
+  ignore_errors: true
+  changed_when: false
+
+
+- name: Download get-pip.py
+  vars:
+    pip_version_url: "{{ (pip_get_pip_version == 'latest') | ternary('', pip_get_pip_version) }}"
+    required_vars:
+      - pip_get_pip_version
+  debug:
+    msg: 'https://bootstrap.pypa.io/pip/{{ pip_version_url }}/get-pip.py'
+  when: (pip_version_output is failed) or not pip_version_output.stdout is search(pip_version)
+
+- name: Download get-pip.py
+  vars:
+    pip_version_url: "{{ (pip_get_pip_version == 'latest') | ternary('', pip_get_pip_version) }}"
+    required_vars:
+      - pip_get_pip_version
+  get_url:
+    url: 'https://bootstrap.pypa.io/pip/{{ pip_version_url }}/get-pip.py'
+    dest: /tmp/get-pip.py
+  when: (pip_version_output is failed) or not pip_version_output.stdout is search(pip_version)
+
+# Install pip if it's not already installed, or if
+# the desired versions of pip aren't installed
+# The regular expression extracts '9.0' out of '9.0.*'
+- name: Install pip
+  command: "{{ ansible_python_interpreter if ansible_python_interpreter is defined else 'python' }} get-pip.py pip=={{ pip_version }}"
+  when: "(pip_version_output is failed) or not pip_version_output.stdout is search('pip ' + pip_version)"
+  args:
+    chdir: /tmp
+
+- name: "Remove package dependencies that are no longer required"
+  apt:
+    autoremove: true
+    autoclean: true

@@ -1,0 +1,15 @@
+---
+pip_version: "20.0.2"
+pip_get_pip_version: "3.6"
+pip_executable: "pip"
+pkgs_common:
+  - python3
+  - python3-pip
+  - python3-setuptools
+  - build-essential
+
+pkgs_ubuntu:
+  - nginx
+
+pkgs_centos:
+  - httpd

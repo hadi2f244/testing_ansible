@@ -1,0 +1,46 @@
+---
+
+- name: Verify_All
+  hosts: all
+  gather_facts: true
+  tasks:
+
+    - name: "Set variables"
+      set_fact:
+        debug_mode: false
+
+    - name: "Test nginx package is installed | Check"
+      package:
+        name: "nginx"
+        state: present
+      check_mode: true
+      ignore_errors: true
+      register: nginx_pkg_status_res
+    - name: "Test nginx package is installed | Debug"
+      debug:
+        msg: "{{ nginx_pkg_status_res }}"
+      when: debug_mode
+    - name: "Test docker package is installed | Assert"
+      assert:
+        that:
+          - not nginx_pkg_status_res.changed
+          - not nginx_pkg_status_res.failed
+
+
+    - name: "Test nginx service is running and enabled | Check"
+      service:
+        name: nginx
+        state: started
+        enabled: true
+      check_mode: true
+      ignore_errors: true
+      register: nginx_service_status_res
+    - name: "Test nginx service is running and enabled | Debug"
+      debug:
+        msg: "{{ nginx_service_status_res }}"
+      when: debug_mode
+    - name: "Test nginx service is running and enabled  | Assert"
+      assert:
+        that:
+          - not nginx_service_status_res.changed
+          - not nginx_service_status_res.failed

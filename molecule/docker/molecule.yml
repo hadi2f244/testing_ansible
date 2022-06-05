@@ -1,0 +1,37 @@
+---
+
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: test-docker-1
+    # https://github.com/kilip/docker-molecule-images
+    image: kilip/molecule-ubuntu:18.04
+    pre_build_image: true
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+    capabilities:
+      - SYS_ADMIN
+    groups:
+      - molecule-docker
+
+provisioner:
+  name: ansible
+  inventory:
+    hosts:
+      molecule-docker:
+    links:
+      group_vars: ../../group_vars
+      host_vars: ../../host_vars
+verifier:
+  name: ansible
+lint: |
+  set -e
+  export ANSIBLE_ROLES_PATH=./roles
+  yamllint -c ./molecule/.yamllint .
+  ansible-lint
+  flake8

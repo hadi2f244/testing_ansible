@@ -1,0 +1,9 @@
+---
+- name: gather facts
+  hosts: molecule-docker
+
+- name: Converge edge servers
+  hosts: molecule-docker
+  gather_facts: true
+  roles:
+    - {role: package, tags: "package", become: true}
