@@ -1,8 +1,6 @@
 ---
 
 - name: Package.yml Main YML File
-  include_tasks: package_ubuntu.yaml
+  include_tasks: package.yaml
   tags:
     - package
-  when:
-    - ansible_distribution == "Ubuntu"

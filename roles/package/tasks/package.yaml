@@ -16,12 +16,10 @@
     cache_valid_time: 3600
   with_items:
     - "{{ pkgs_common }}"
-    - "{{ pkgs_ubuntu }}"
   loop_control:
     loop_var: pkgs_item
   when:
     - pkgs_common is defined
-    - pkgs_ubuntu is defined
   notify: Restart Nginx
 
 - name: "Create symlinks python and pip"
@@ -36,16 +34,6 @@
   ignore_errors: true
   changed_when: false
 
-
-- name: Download get-pip.py
-  vars:
-    pip_version_url: "{{ (pip_get_pip_version == 'latest') | ternary('', pip_get_pip_version) }}"
-    required_vars:
-      - pip_get_pip_version
-  debug:
-    msg: 'https://bootstrap.pypa.io/pip/{{ pip_version_url }}/get-pip.py'
-  when: (pip_version_output is failed) or not pip_version_output.stdout is search(pip_version)
-
 - name: Download get-pip.py
   vars:
     pip_version_url: "{{ (pip_get_pip_version == 'latest') | ternary('', pip_get_pip_version) }}"
@@ -56,9 +44,6 @@
     dest: /tmp/get-pip.py
   when: (pip_version_output is failed) or not pip_version_output.stdout is search(pip_version)
 
-# Install pip if it's not already installed, or if
-# the desired versions of pip aren't installed
-# The regular expression extracts '9.0' out of '9.0.*'
 - name: Install pip
   command: "{{ ansible_python_interpreter if ansible_python_interpreter is defined else 'python' }} get-pip.py pip=={{ pip_version }}"
   when: "(pip_version_output is failed) or not pip_version_output.stdout is search('pip ' + pip_version)"
