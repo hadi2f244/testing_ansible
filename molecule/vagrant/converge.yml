@@ -1,0 +1,22 @@
+---
+- name: gather facts
+  hosts: molecule-vagrant
+
+- name: Converge edge servers
+  hosts: molecule-vagrant
+  gather_facts: true
+  pre_tasks:
+  - name: Ensure group "vboxsf" exists with correct gid | avoid 999 gid
+    group:
+      name: vboxsf
+      state: present
+      gid: 1999
+    become: true
+  - name: Ensure user "vboxadd" exists with correct uid | avoid 999 gid
+    user:
+      name: vboxadd
+      state: present
+      uid: 1999
+    become: true
+  roles:
+    - {role: package, tags: "package", become: true}

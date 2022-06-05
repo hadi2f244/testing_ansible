@@ -1,7 +1,7 @@
 ---
 
 - name: Verify_All
-  hosts: molecule-docker
+  hosts: molecule-vagrant
   gather_facts: true
   tasks:
 

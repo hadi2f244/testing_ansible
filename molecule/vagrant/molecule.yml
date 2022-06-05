@@ -1,0 +1,30 @@
+---
+
+
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+platforms:
+  - name: test-vagrant-1
+    box: bento/ubuntu-18.04
+    cpus: 1
+    memory: 2048
+    groups:
+      - molecule-vagrant
+provisioner:
+  name: ansible
+  inventory:
+    hosts:
+      molecule-vagrant:
+    links:
+      group_vars: ../../group_vars
+      host_vars: ../../host_vars
+verifier:
+  name: ansible
+lint: |
+  set -e
+  export ANSIBLE_ROLES_PATH=./roles
+  yamllint -c ./molecule/.yamllint .
+  ansible-lint
+  flake8
