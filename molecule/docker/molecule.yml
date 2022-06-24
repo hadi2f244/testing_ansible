@@ -28,7 +28,9 @@ provisioner:
       group_vars: ../../group_vars
       host_vars: ../../host_vars
 verifier:
-  name: ansible
+  name: testinfra
+  lint:
+    name: flake8 
 lint: |
   set -e
   export ANSIBLE_ROLES_PATH=./roles
