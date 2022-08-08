@@ -2,8 +2,8 @@
 Testing Ansible code example.
 Follow these medium posts:
 
-- Part 1 - Test Environment Automation (master branch)
-- Part 2 - Writing Tests (testinfra branch)
+- [Part 1 - Test Environment Automation](https://medium.com/@m.h.azaddel/ansible-code-testing-part-1-test-environment-automation-36f3983d9c2f) (master branch)
+- [Part 2 - Writing Tests](https://medium.com/@m.h.azaddel/ansible-code-testing-part-2-writing-tests-9bed51134e08) (testinfra branch)
 
 # Requirements
 + Ansible (*Tested on `2.12.2`*)
